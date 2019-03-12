@@ -1,16 +1,15 @@
 language: go
 go:
-- 1.9.x
+- 1.12.x
+
+go_import_path: github.com/segmentio/terraform-docs
 
 sudo: false
 
 before_install:
 - if [ ${TRAVIS_TAG::1} = v ];
   then
-    go get github.com/Masterminds/glide &&
-    cd ../.. &&
-    mv coveo segmentio/ &&
-    cd segmentio/terraform-docs;
+    go get github.com/Masterminds/glide;
   fi
 
 install:
