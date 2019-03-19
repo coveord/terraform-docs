@@ -163,6 +163,7 @@ func main() {
 	}
 
 	printRequired := !args["--no-required"].(bool)
+	terraformOutput := args["--terraform-output"].(bool)
 
 	var out string
 
@@ -170,15 +171,11 @@ func main() {
 	case args["markdown"].(bool) || args["md"].(bool):
 		out, err = print.Markdown(document, renderMode, printRequired, args["--out-values"] != nil)
 	case args["json"].(bool):
-		if args["--terraform-output"].(bool) {
-			out, err = print.TerraformOutput(document, renderMode)
-		} else {
-			out, err = print.JSON(document, renderMode)
-		}
+		out, err = print.JSON(document, renderMode, terraformOutput)
 	case args["yaml"].(bool):
-		out, err = print.YAML(document, renderMode)
+		out, err = print.YAML(document, renderMode, terraformOutput)
 	case args["hcl"].(bool):
-		out, err = print.HCL(document, renderMode)
+		out, err = print.HCL(document, renderMode, terraformOutput)
 	case args["xml"].(bool):
 		out, err = print.XML(document, renderMode)
 	default:
