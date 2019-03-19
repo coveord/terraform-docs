@@ -204,6 +204,19 @@ func HCL(d *doc.Doc, mode RenderMode, terraformOutput bool) (string, error) {
 	return string(result), nil
 }
 
+// MAP printer prints output like terraform output.
+func MAP(d *doc.Doc, mode RenderMode) (string, error) {
+	var buf bytes.Buffer
+
+	if len(d.Outputs) > 0 {
+		for _, o := range d.Outputs {
+			buf.WriteString(fmt.Sprintf("%s = %s\n", o.Name, o))
+		}
+	}
+
+	return buf.String(), nil
+}
+
 // TerraformOutput generate a map corresponding to the given doc as 'terraform output'.
 func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interface{} {
 	if !terraformOutput {

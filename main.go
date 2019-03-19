@@ -178,6 +178,8 @@ func main() {
 		out, err = print.HCL(document, renderMode, terraformOutput)
 	case args["xml"].(bool):
 		out, err = print.XML(document, renderMode)
+	case terraformOutput:
+		out, err = print.MAP(document, renderMode)
 	default:
 		out, err = print.Pretty(document, renderMode)
 	}
