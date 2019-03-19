@@ -1,23 +1,12 @@
-language: go
-go:
-- 1.9.x
-
 sudo: false
 
-before_install:
-- if [ ${TRAVIS_TAG::1} = v ];
-  then
-    go get github.com/Masterminds/glide &&
-    cd ../.. &&
-    mv coveo segmentio/ &&
-    cd segmentio/terraform-docs;
-  fi
+language: go
 
-install:
-- if [ ${TRAVIS_TAG::1} = v ];
-  then
-    glide install;
-  fi
+go:
+- 1.12.x
+
+env:
+- GO111MODULE=on
 
 script:
 - if [ ${TRAVIS_TAG::1} = v ];
