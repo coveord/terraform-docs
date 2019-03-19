@@ -201,6 +201,21 @@ func HCL(d *doc.Doc, mode RenderMode) (string, error) {
 	return string(result), nil
 }
 
+// TerraformOutput prints the given doc as 'terraform output -json'.
+func TerraformOutput(d *doc.Doc, mode RenderMode) (string, error) {
+	jsonOutput := make(map[string]doc.Result)
+	for i := range filter(*d, mode).Outputs {
+		o := &d.Outputs[i]
+		jsonOutput[o.Name] = o.Result
+	}
+	result, err := json.MarshalIndent(jsonOutput, "", "  ")
+	if err != nil {
+		return "", err
+	}
+
+	return string(result), nil
+}
+
 func filter(d doc.Doc, mode RenderMode) doc.Doc {
 	switch mode & RenderAll {
 	case RenderInputs:
