@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/coveo/gotemplate/hcl"
+	"github.com/coveo/gotemplate/v3/hcl"
 	"github.com/fatih/color"
 	"github.com/segmentio/terraform-docs/doc"
 	yaml "gopkg.in/yaml.v2"
