@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/coveo/gotemplate/v3/hcl"
@@ -226,10 +227,31 @@ func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interfac
 	output := make(map[string]doc.Result)
 	for i := range filter(*d, mode).Outputs {
 		o := &d.Outputs[i]
+		// if o.Result.Value == nil {
+		o.Result.Value = defaultValue(o.Description)
+		// }
 		output[o.Name] = o.Result
 	}
 
 	return output
+}
+
+func defaultValue(description string) interface{} {
+	// Extract default value from description
+	var result map[string]interface{}
+	err := yaml.Unmarshal([]byte(formatYamlDesc(description)), &result)
+	if err == nil {
+		if val, ok := result["default"]; ok {
+			return val
+		}
+	}
+	return nil
+}
+
+func formatYamlDesc(d string) string {
+	// Multiline descriptions with tabs cause issue when Unmarshaling
+	re := regexp.MustCompile(`\n\s+`)
+	return re.ReplaceAllString(strings.TrimSpace(d), "\n")
 }
 
 func filter(d doc.Doc, mode RenderMode) doc.Doc {
