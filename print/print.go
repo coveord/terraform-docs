@@ -2,16 +2,14 @@ package print
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"strings"
 
-	"github.com/coveo/gotemplate/v3/collections"
 	"github.com/coveo/gotemplate/v3/hcl"
-	"gopkg.in/yaml.v2"
+	"github.com/coveo/gotemplate/v3/json"
+	"github.com/coveo/gotemplate/v3/yaml"
 
-	// "github.com/coveo/gotemplate/v3/yaml"
 	"github.com/fatih/color"
 	"github.com/segmentio/terraform-docs/doc"
 	// yaml "gopkg.in/yaml.v2"
@@ -231,34 +229,12 @@ func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interfac
 	for i := range filter(*d, mode).Outputs {
 		o := &d.Outputs[i]
 		if o.Result.Value == nil {
-			o.Result.Value = defaultValue(o.Description)
+			o.Result.Value = o.Result.DefaultValue
 		}
 		output[o.Name] = o.Result
 	}
 
 	return output
-}
-
-func defaultValue(description string) interface{} {
-
-	// Extract default value from description
-	var result map[string]interface{}
-	// err := yaml.Unmarshal([]byte(formatYamlDesc(description)), &result)
-	err := collections.ConvertData(description, &result)
-	if err == nil {
-		if val, ok := result["default"]; ok {
-			return val
-		}
-	}
-	return fmt.Sprintf("%+v", err)
-}
-
-func formatYamlDesc(d string) string {
-	// Multiline descriptions with tabs cause issue when Unmarshaling
-	return d
-
-	// re := regexp.MustCompile(`\n\s+`)
-	// return re.ReplaceAllString(strings.TrimSpace(d), "\n")
 }
 
 func filter(d doc.Doc, mode RenderMode) doc.Doc {

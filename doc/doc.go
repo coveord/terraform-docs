@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/hcl/ast"
+
+	"github.com/coveo/gotemplate/v3/collections"
 )
 
 // Input represents a terraform input variable.
@@ -49,9 +51,10 @@ type Output struct {
 
 // Result represents a terraform output value.
 type Result struct {
-	Sensitive bool        `json:",omitempty" yaml:",omitempty" xml:",attr,omitempty"`
-	Type      string      `json:",omitempty" yaml:",omitempty" xml:",attr,omitempty"`
-	Value     interface{} `json:",omitempty" yaml:",omitempty" xml:",omitempty"`
+	Sensitive    bool        `json:",omitempty" yaml:",omitempty" xml:",attr,omitempty"`
+	Type         string      `json:",omitempty" yaml:",omitempty" xml:",attr,omitempty"`
+	Value        interface{} `json:",omitempty" yaml:",omitempty" xml:",omitempty"`
+	DefaultValue interface{} `json:"-" yaml:"-" xml:"-"`
 }
 
 func (o Output) String() string {
@@ -162,14 +165,32 @@ func outputs(list *ast.ObjectList) []Output {
 				desc = comment(item.LeadComment.List)
 			}
 
+			defaultValue, description := getDescStruct(desc)
+
 			ret = append(ret, Output{
 				Name:        name,
-				Description: strings.TrimSpace(desc),
+				Description: description,
+				Result:      Result{DefaultValue: defaultValue},
 			})
 		}
 	}
 
 	return ret
+}
+
+func getDescStruct(d string) (interface{}, string) {
+	var result map[string]interface{}
+	var val interface{}
+	err := collections.ConvertData(d, &result)
+
+	if err == nil {
+		if v, ok := result["description"]; ok {
+			d = v.(string)
+		}
+		val, _ = result["default"]
+	}
+
+	return val, strings.TrimSpace(d)
 }
 
 // Get `key` from the list of object `items`.
