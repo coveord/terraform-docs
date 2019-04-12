@@ -157,7 +157,7 @@ func main() {
 		for i := range document.Outputs {
 			o := &document.Outputs[i]
 			if matched := outputs[o.Name]; matched != nil {
-				o.Result = doc.Result{Sensitive: matched.Sensitive, Type: matched.Type, Value: matched.Value}
+				o.Result = doc.Result{Sensitive: matched.Sensitive, Type: matched.Type, Value: matched.Value, DefaultValue: o.Result.DefaultValue}
 			}
 		}
 	}

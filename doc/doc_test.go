@@ -48,6 +48,15 @@ func Test_getDescStruct(t *testing.T) {
 			description =  "description_works"
 		`, "default_works", "description_works",
 		},
+		{
+			"YAML with default struct and description",
+			`
+			default:
+				key1: value1
+				key2: value2
+			description: Struct default value
+		`, map[string]interface{}{"key1": "value1", "key2": "value2"}, "Struct default value",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

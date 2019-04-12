@@ -142,7 +142,8 @@ func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (str
 		for _, v := range d.Outputs {
 			var val string
 			if printValues {
-				val = fmt.Sprintf(" `%v ` | %s | %s |", v.Result.Value, v.Result.Type, humanize(v.Result.Sensitive))
+				value := getValue(v.Result)
+				val = fmt.Sprintf(" `%v ` | %s | %s |", value, v.Result.Type, humanize(v.Result.Sensitive))
 			}
 			buf.WriteString(fmt.Sprintf("| %s | %s |%s\n", v.Name, normalizeMarkdownDesc(v.Description), val))
 		}
@@ -228,13 +229,18 @@ func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interfac
 	output := make(map[string]doc.Result)
 	for i := range filter(*d, mode).Outputs {
 		o := &d.Outputs[i]
-		if o.Result.Value == nil {
-			o.Result.Value = o.Result.DefaultValue
-		}
+		o.Result.Value = getValue(o.Result)
 		output[o.Name] = o.Result
 	}
 
 	return output
+}
+
+func getValue(r doc.Result) interface{} {
+	if r.Value == nil || r.Type == "map" && len(r.Value.(map[string]interface{})) == 0 {
+		return r.DefaultValue
+	}
+	return r.Value
 }
 
 func filter(d doc.Doc, mode RenderMode) doc.Doc {
