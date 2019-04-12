@@ -237,9 +237,15 @@ func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interfac
 }
 
 func getValue(r doc.Result) interface{} {
-	if r.Value == nil || r.Type == "map" && len(r.Value.(map[string]interface{})) == 0 {
+	if r.Value == nil {
 		return r.DefaultValue
 	}
+
+	// If it is an empty list or empty struct and there is a default value, we return it, otherwise, we just return the empty type
+	if r.DefaultValue != nil && (r.Type == "list" && len(r.Value.([]interface{})) == 0 || (r.Type == "map" && len(r.Value.(map[string]interface{})) == 0)) {
+		return r.DefaultValue
+	}
+
 	return r.Value
 }
 
