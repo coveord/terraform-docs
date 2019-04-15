@@ -12,7 +12,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/segmentio/terraform-docs/doc"
-	// yaml "gopkg.in/yaml.v2"
 )
 
 // RenderMode represents the mode used to render the results
@@ -142,8 +141,7 @@ func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (str
 		for _, v := range d.Outputs {
 			var val string
 			if printValues {
-				value := getValue(v.Result)
-				val = fmt.Sprintf(" `%v ` | %s | %s |", value, v.Result.Type, humanize(v.Result.Sensitive))
+				val = fmt.Sprintf(" `%v ` | %s | %s |", v, v.Result.Type, humanize(v.Result.Sensitive))
 			}
 			buf.WriteString(fmt.Sprintf("| %s | %s |%s\n", v.Name, normalizeMarkdownDesc(v.Description), val))
 		}
@@ -229,24 +227,10 @@ func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interfac
 	output := make(map[string]doc.Result)
 	for i := range filter(*d, mode).Outputs {
 		o := &d.Outputs[i]
-		o.Result.Value = getValue(o.Result)
 		output[o.Name] = o.Result
 	}
 
 	return output
-}
-
-func getValue(r doc.Result) interface{} {
-	if r.Value == nil {
-		return r.DefaultValue
-	}
-
-	// If it is an empty string, list or struct and there is a default value, we return it, otherwise, we just return the empty type
-	if r.DefaultValue != nil && (r.Type == "string" && len(r.Value.(string)) == 0 || r.Type == "list" && len(r.Value.([]interface{})) == 0 || (r.Type == "map" && len(r.Value.(map[string]interface{})) == 0)) {
-		return r.DefaultValue
-	}
-
-	return r.Value
 }
 
 func filter(d doc.Doc, mode RenderMode) doc.Doc {

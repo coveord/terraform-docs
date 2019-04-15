@@ -301,3 +301,17 @@ func header(c *ast.CommentGroup) (comment string) {
 
 	return comment
 }
+
+// GetValue returns either Value or DefaultValue if Value is not set
+func GetValue(r Result) interface{} {
+	if r.Value == nil {
+		return r.DefaultValue
+	}
+
+	// If it is an empty string, list or struct and there is a default value, we return it, otherwise, we just return the empty type
+	if r.DefaultValue != nil && (r.Type == "string" && len(r.Value.(string)) == 0 || r.Type == "list" && len(r.Value.([]interface{})) == 0 || (r.Type == "map" && len(r.Value.(map[string]interface{})) == 0)) {
+		return r.DefaultValue
+	}
+
+	return r.Value
+}
