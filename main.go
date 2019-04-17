@@ -159,8 +159,11 @@ func main() {
 			if matched := outputs[o.Name]; matched != nil {
 				o.Result = doc.Result{Sensitive: matched.Sensitive, Type: matched.Type, Value: matched.Value, DefaultValue: o.Result.DefaultValue}
 			}
+
 			// Set default value
-			o.Result.Value = doc.GetValue(o.Result)
+			if o.Result.Value == nil {
+				o.Result.Value = o.Result.DefaultValue
+			}
 		}
 	}
 
