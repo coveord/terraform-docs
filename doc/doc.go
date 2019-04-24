@@ -7,9 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/hcl/hcl/ast"
-
 	"github.com/coveo/gotemplate/v3/collections"
+	"github.com/hashicorp/hcl/hcl/ast"
 )
 
 // Input represents a terraform input variable.
@@ -49,19 +48,19 @@ type Output struct {
 	Result      `yaml:",inline,omitempty" hcl:",inline,omitempty"`
 }
 
+func (o Output) String() string {
+	if o.Result.Value == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v", o.Result.Value)
+}
+
 // Result represents a terraform output value.
 type Result struct {
 	Sensitive    bool        `json:",omitempty" yaml:",omitempty" xml:",attr,omitempty"`
 	Type         string      `json:",omitempty" yaml:",omitempty" xml:",attr,omitempty"`
 	Value        interface{} `json:",omitempty" yaml:",omitempty" xml:",omitempty"`
 	DefaultValue interface{} `json:"-" yaml:"-" xml:"-"`
-}
-
-func (o Output) String() string {
-	if o.Result.Value == nil {
-		return ""
-	}
-	return fmt.Sprintf("%v", o.Result.Value)
 }
 
 // Doc represents a terraform module doc.

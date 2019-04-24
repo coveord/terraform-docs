@@ -9,7 +9,6 @@ import (
 	"github.com/coveo/gotemplate/v3/hcl"
 	"github.com/coveo/gotemplate/v3/json"
 	"github.com/coveo/gotemplate/v3/yaml"
-
 	"github.com/fatih/color"
 	"github.com/segmentio/terraform-docs/doc"
 )

@@ -1,0 +1,6 @@
+{
+    "go.formatTool": "goimports",
+    "cSpell.words": [
+        "segmentio"
+    ]
+}
