@@ -2,15 +2,15 @@ package print
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"strings"
 
 	"github.com/coveo/gotemplate/v3/hcl"
+	"github.com/coveo/gotemplate/v3/json"
+	"github.com/coveo/gotemplate/v3/yaml"
 	"github.com/fatih/color"
 	"github.com/segmentio/terraform-docs/doc"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // RenderMode represents the mode used to render the results
@@ -140,7 +140,7 @@ func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (str
 		for _, v := range d.Outputs {
 			var val string
 			if printValues {
-				val = fmt.Sprintf(" `%v ` | %s | %s |", v.Result.Value, v.Result.Type, humanize(v.Result.Sensitive))
+				val = fmt.Sprintf(" `%v ` | %s | %s |", v, v.Result.Type, humanize(v.Result.Sensitive))
 			}
 			buf.WriteString(fmt.Sprintf("| %s | %s |%s\n", v.Name, normalizeMarkdownDesc(v.Description), val))
 		}
