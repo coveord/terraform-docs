@@ -21,7 +21,7 @@ var version = "dev"
 
 const usage = `
 Usage:
-  terraform-docs [--inputs| --outputs] [--detailed] [--no-required] [--out-values=<file>] [--var-file=<file>...] [--color| --no-color] [json | yaml | hcl | md | markdown | xml] [<path>...]
+  terraform-docs [--inputs| --outputs] [--terraform-output] [--detailed] [--no-required] [--out-values=<file>] [--var-file=<file>...] [--color| --no-color] [json | yaml | hcl | md | markdown | xml] [<path>...]
   terraform-docs -h | --help
 
 Examples:
@@ -46,6 +46,7 @@ Examples:
 Options:
   -i, --inputs             Render only inputs
   -o, --outputs            Render only outputs
+  -t, --terraform-output   Render outputs in terraform output format ('terraform output -json')
   -d, --detailed           Render detailed value for <list> and <map>
   -c, --color              Force rendering of color even if the output is redirected or piped
   -C, --no-color           Do not use color to render the result
@@ -162,6 +163,7 @@ func main() {
 	}
 
 	printRequired := !args["--no-required"].(bool)
+	terraformOutput := args["--terraform-output"].(bool)
 
 	var out string
 
@@ -169,13 +171,15 @@ func main() {
 	case args["markdown"].(bool) || args["md"].(bool):
 		out, err = print.Markdown(document, renderMode, printRequired, args["--out-values"] != nil)
 	case args["json"].(bool):
-		out, err = print.JSON(document, renderMode)
+		out, err = print.JSON(document, renderMode, terraformOutput)
 	case args["yaml"].(bool):
-		out, err = print.YAML(document, renderMode)
+		out, err = print.YAML(document, renderMode, terraformOutput)
 	case args["hcl"].(bool):
-		out, err = print.HCL(document, renderMode)
+		out, err = print.HCL(document, renderMode, terraformOutput)
 	case args["xml"].(bool):
 		out, err = print.XML(document, renderMode)
+	case terraformOutput:
+		out, err = print.MAP(document, renderMode)
 	default:
 		out, err = print.Pretty(document, renderMode)
 	}

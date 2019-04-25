@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/coveo/gotemplate/hcl"
+	"github.com/coveo/gotemplate/v3/hcl"
 	"github.com/fatih/color"
 	"github.com/segmentio/terraform-docs/doc"
 	yaml "gopkg.in/yaml.v2"
@@ -150,8 +150,9 @@ func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (str
 }
 
 // JSON prints the given doc as json.
-func JSON(d *doc.Doc, mode RenderMode) (string, error) {
-	result, err := json.MarshalIndent(filter(*d, mode), "", "  ")
+func JSON(d *doc.Doc, mode RenderMode, terraformOutput bool) (string, error) {
+	output := TerraformOutput(d, mode, terraformOutput)
+	result, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
 		return "", err
 	}
@@ -160,8 +161,9 @@ func JSON(d *doc.Doc, mode RenderMode) (string, error) {
 }
 
 // YAML prints the given doc as yaml.
-func YAML(d *doc.Doc, mode RenderMode) (string, error) {
-	result, err := yaml.Marshal(filter(*d, mode))
+func YAML(d *doc.Doc, mode RenderMode, terraformOutput bool) (string, error) {
+	output := TerraformOutput(d, mode, terraformOutput)
+	result, err := yaml.Marshal(output)
 	if err != nil {
 		return "", err
 	}
@@ -192,13 +194,42 @@ func XML(d *doc.Doc, mode RenderMode) (string, error) {
 }
 
 // HCL prints the given doc as hcl.
-func HCL(d *doc.Doc, mode RenderMode) (string, error) {
-	result, err := hcl.MarshalIndent(filter(*d, mode), "", "  ")
+func HCL(d *doc.Doc, mode RenderMode, terraformOutput bool) (string, error) {
+	output := TerraformOutput(d, mode, terraformOutput)
+	result, err := hcl.MarshalIndent(output, "", "  ")
 	if err != nil {
 		return "", err
 	}
 
 	return string(result), nil
+}
+
+// MAP printer prints output like terraform output.
+func MAP(d *doc.Doc, mode RenderMode) (string, error) {
+	var buf bytes.Buffer
+
+	if len(d.Outputs) > 0 {
+		for _, o := range d.Outputs {
+			buf.WriteString(fmt.Sprintf("%s = %s\n", o.Name, o))
+		}
+	}
+
+	return buf.String(), nil
+}
+
+// TerraformOutput generate a map corresponding to the given doc as 'terraform output'.
+func TerraformOutput(d *doc.Doc, mode RenderMode, terraformOutput bool) interface{} {
+	if !terraformOutput {
+		return filter(*d, mode)
+	}
+
+	output := make(map[string]doc.Result)
+	for i := range filter(*d, mode).Outputs {
+		o := &d.Outputs[i]
+		output[o.Name] = o.Result
+	}
+
+	return output
 }
 
 func filter(d doc.Doc, mode RenderMode) doc.Doc {
