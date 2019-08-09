@@ -80,7 +80,7 @@ func Pretty(d *doc.Doc, mode RenderMode) (string, error) {
 }
 
 // Markdown prints the given doc as markdown.
-func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (string, error) {
+func Markdown(d *doc.Doc, mode RenderMode, printRequired, printSensitive, printValues bool) (string, error) {
 	var buf bytes.Buffer
 
 	if len(d.Comment) > 0 {
@@ -129,9 +129,14 @@ func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (str
 		if len(d.Outputs) > 0 {
 			var ext, sep string
 			if printValues {
-				ext = " Value | Type | Sensitive |"
-				sep = "-------|------|-----------|"
+				ext = " Value | Type |"
+				sep = "-------|------|"
+				if printSensitive {
+					ext += " Sensitive |"
+					sep += "-----------|"
+				}
 			}
+
 			buf.WriteString("\n## Outputs\n\n")
 			buf.WriteString(fmt.Sprintf("| Name | Description |%s\n", ext))
 			buf.WriteString(fmt.Sprintf("|------|-------------|%s\n", sep))
@@ -140,9 +145,13 @@ func Markdown(d *doc.Doc, mode RenderMode, printRequired, printValues bool) (str
 		for _, v := range d.Outputs {
 			var val string
 			if printValues {
-				val = fmt.Sprintf(" `%v ` | %s | %s |", v, v.Result.Type, humanize(v.Result.Sensitive))
+				val = fmt.Sprintf(" `%v ` | %s |", v, v.Result.Type)
+				if printSensitive {
+					val += fmt.Sprintf(" %s |", humanize(v.Result.Sensitive))
+				}
 			}
-			buf.WriteString(fmt.Sprintf("| %s | %s |%s\n", v.Name, normalizeMarkdownDesc(v.Description), val))
+
+			buf.WriteString(fmt.Sprintf("| `%s` | %s |%s\n", v.Name, normalizeMarkdownDesc(v.Description), val))
 		}
 	}
 
