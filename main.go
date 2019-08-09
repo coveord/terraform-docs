@@ -21,7 +21,7 @@ var version = "dev"
 
 const usage = `
 Usage:
-  terraform-docs [--inputs| --outputs] [--terraform-output] [--detailed] [--no-required] [--out-values=<file>] [--var-file=<file>...] [--color| --no-color] [json | yaml | hcl | md | markdown | xml] [<path>...]
+  terraform-docs [--inputs| --outputs] [--terraform-output] [--detailed] [--no-required] [--no-sensitive] [--out-values=<file>] [--var-file=<file>...] [--color| --no-color] [json | yaml | hcl | md | markdown | xml] [<path>...]
   terraform-docs -h | --help
 
 Examples:
@@ -51,6 +51,7 @@ Options:
   -c, --color              Force rendering of color even if the output is redirected or piped
   -C, --no-color           Do not use color to render the result
   -R, --no-required        Do not output "Required" column
+  -S, --no-sensitive       Do not output "Sensitive" column
   -O, --out-values=<file>  File used to get output values (result of 'terraform output -json' or 'terraform plan -out file')
   -v, --var-file=<file>... Files used to assign values to terraform variables (HCL format) 
   -h, --help               Show help information
@@ -168,13 +169,14 @@ func main() {
 	}
 
 	printRequired := !args["--no-required"].(bool)
+	printSensitive := !args["--no-sensitive"].(bool)
 	terraformOutput := args["--terraform-output"].(bool)
 
 	var out string
 
 	switch {
 	case args["markdown"].(bool) || args["md"].(bool):
-		out, err = print.Markdown(document, renderMode, printRequired, args["--out-values"] != nil)
+		out, err = print.Markdown(document, renderMode, printRequired, printSensitive, args["--out-values"] != nil)
 	case args["json"].(bool):
 		out, err = print.JSON(document, renderMode, terraformOutput)
 	case args["yaml"].(bool):
