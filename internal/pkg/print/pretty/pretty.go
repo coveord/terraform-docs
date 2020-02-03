@@ -128,17 +128,39 @@ func printOutputs(buffer *bytes.Buffer, outputs []*tfconf.Output, settings *prin
 
 	for _, output := range outputs {
 		var format string
-		if settings.ShowColor {
+		// if settings.ShowColor {
+		// 	format = "\033[36moutput.%s\033[0m\n\033[90m%s\033[0m\n\n"
+		// } else {
+		// 	format = "output.%s\n%s\n\n"
+		// }
+
+		if settings.ShowColor && settings.InjectOutputValues != "" {
+			format = "\033[36moutput.%s\033[0m\n\033[90m%s\033[0m\n\033[90m%s\033[0m\n\n"
+		} else if settings.ShowColor {
 			format = "\033[36moutput.%s\033[0m\n\033[90m%s\033[0m\n\n"
+		} else if settings.InjectOutputValues != "" {
+			format = "output.%s\n%s\n%s\n\n"
 		} else {
 			format = "output.%s\n%s\n\n"
 		}
-		buffer.WriteString(
-			fmt.Sprintf(
-				format,
-				output.Name,
-				getDescription(output.Description.String()),
-			),
-		)
+
+		if settings.InjectOutputValues != "" {
+			buffer.WriteString(
+				fmt.Sprintf(
+					format,
+					output.Name,
+					getDescription(output.Description.String()),
+					getDescription(output.Value),
+				),
+			)
+		} else {
+			buffer.WriteString(
+				fmt.Sprintf(
+					format,
+					output.Name,
+					getDescription(output.Description.String()),
+				),
+			)
+		}
 	}
 }

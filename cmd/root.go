@@ -43,6 +43,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.PersistentFlags().StringVarP(&settings.InjectOutputValues, "inject-output-values", "n", "", "inject output values")
 	rootCmd.PersistentFlags().BoolVar(new(bool), "no-header", false, "do not show module header")
 	rootCmd.PersistentFlags().BoolVar(new(bool), "no-providers", false, "do not show providers")
 	rootCmd.PersistentFlags().BoolVar(new(bool), "no-inputs", false, "do not show inputs")
@@ -74,7 +75,7 @@ func Execute() error {
 }
 
 func doPrint(paths []string, fn func(*tfconf.Module) (string, error)) {
-	module, err := tfconf.CreateModule(paths[0])
+	module, err := tfconf.CreateModule(paths[0], settings)
 	if err != nil {
 		log.Fatal(err)
 	}

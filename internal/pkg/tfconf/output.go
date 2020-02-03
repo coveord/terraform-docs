@@ -2,8 +2,9 @@ package tfconf
 
 // Output represents a Terraform output.
 type Output struct {
-	Name        string   `json:"name"`
-	Description String   `json:"description"`
+	Name        string `json:"name"`
+	Description String `json:"description"`
+	Value       string
 	Position    Position `json:"-"`
 }
 
