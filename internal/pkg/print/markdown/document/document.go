@@ -169,7 +169,7 @@ func printOutputs(buffer *bytes.Buffer, outputs []*tfconf.Output, settings *prin
 		buffer.WriteString(fmt.Sprintf("%s %s\n\n", markdown.GenerateIndentation(1, settings), markdown.SanitizeName(output.Name, settings)))
 		buffer.WriteString(fmt.Sprintf("Description: %s\n", markdown.SanitizeItemForDocument(output.Description.String(), settings)))
 
-		if settings.InjectOutputValues != "" {
+		if settings.OutputValues {
 			buffer.WriteString(fmt.Sprintf("Value: %s\n", markdown.SanitizeItemForDocument(output.Value, settings)))
 		}
 	}

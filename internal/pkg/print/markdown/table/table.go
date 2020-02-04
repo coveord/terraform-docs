@@ -141,7 +141,9 @@ func printOutputs(buffer *bytes.Buffer, outputs []*tfconf.Output, settings *prin
 	if len(outputs) == 0 {
 		buffer.WriteString("No output.\n\n")
 		return
-	} else if settings.InjectOutputValues != "" {
+	}
+
+	if settings.OutputValues {
 		buffer.WriteString("| Name | Description | Value |\n")
 		buffer.WriteString("|------|-------------|-------|\n")
 	} else {
@@ -150,7 +152,7 @@ func printOutputs(buffer *bytes.Buffer, outputs []*tfconf.Output, settings *prin
 	}
 
 	for _, output := range outputs {
-		if settings.InjectOutputValues != "" {
+		if settings.OutputValues {
 			buffer.WriteString(
 				fmt.Sprintf(
 					"| %s | %s | %s |\n",

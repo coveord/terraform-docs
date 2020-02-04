@@ -11,6 +11,7 @@ import (
 )
 
 var settings = print.NewSettings()
+var outputValuesPath string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -30,6 +31,7 @@ var rootCmd = &cobra.Command{
 		norequired, _ := cmd.Flags().GetBool("no-required")
 		noescape, _ := cmd.Flags().GetBool("no-escape")
 
+		settings.OutputValues = outputValuesPath != ""
 		settings.ShowHeader = !noheader
 		settings.ShowProviders = !noproviders
 		settings.ShowInputs = !noinputs
@@ -43,7 +45,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&settings.InjectOutputValues, "inject-output-values", "n", "", "inject output values")
+	rootCmd.PersistentFlags().StringVar(&outputValuesPath, "output-values", "", "inject output values from `terraform output --json` into outputs")
 	rootCmd.PersistentFlags().BoolVar(new(bool), "no-header", false, "do not show module header")
 	rootCmd.PersistentFlags().BoolVar(new(bool), "no-providers", false, "do not show providers")
 	rootCmd.PersistentFlags().BoolVar(new(bool), "no-inputs", false, "do not show inputs")
@@ -75,7 +77,7 @@ func Execute() error {
 }
 
 func doPrint(paths []string, fn func(*tfconf.Module) (string, error)) {
-	module, err := tfconf.CreateModule(paths[0], settings)
+	module, err := tfconf.CreateModule(paths[0], outputValuesPath)
 	if err != nil {
 		log.Fatal(err)
 	}
