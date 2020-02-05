@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"sort"
 	"strings"
 
@@ -125,12 +124,10 @@ func CreateModule(path string, outputValuesPath string) (*Module, error) {
 
 	var terraformOutputs map[string]*TerraformOutput
 	if outputValuesPath != "" {
-		jsonFile, err := os.Open(outputValuesPath)
+		byteValue, err := ioutil.ReadFile(outputValuesPath)
 		if err != nil {
 			return nil, fmt.Errorf("caught error while reading the terraform outputs file at %s: %v", outputValuesPath, err)
 		}
-		defer jsonFile.Close()
-		byteValue, err := ioutil.ReadAll(jsonFile)
 		if err := json.Unmarshal(byteValue, &terraformOutputs); err != nil {
 			return nil, err
 		}
