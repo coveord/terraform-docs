@@ -145,16 +145,32 @@ func printOutputs(buffer *bytes.Buffer, outputs []*tfconf.Output, settings *prin
 		return
 	}
 
-	buffer.WriteString("| Name | Description |\n")
-	buffer.WriteString("|------|-------------|\n")
+	if settings.OutputValues {
+		buffer.WriteString("| Name | Description | Value |\n")
+		buffer.WriteString("|------|-------------|-------|\n")
+	} else {
+		buffer.WriteString("| Name | Description |\n")
+		buffer.WriteString("|------|-------------|\n")
+	}
 
 	for _, output := range outputs {
-		buffer.WriteString(
-			fmt.Sprintf(
-				"| %s | %s |\n",
-				markdown.SanitizeName(output.Name, settings),
-				markdown.SanitizeItemForTable(output.Description.String(), settings),
-			),
-		)
+		if settings.OutputValues {
+			buffer.WriteString(
+				fmt.Sprintf(
+					"| %s | %s | %s |\n",
+					markdown.SanitizeName(output.Name, settings),
+					markdown.SanitizeItemForTable(output.Description.String(), settings),
+					markdown.SanitizeItemForTable(output.Value, settings),
+				),
+			)
+		} else {
+			buffer.WriteString(
+				fmt.Sprintf(
+					"| %s | %s |\n",
+					markdown.SanitizeName(output.Name, settings),
+					markdown.SanitizeItemForTable(output.Description.String(), settings),
+				),
+			)
+		}
 	}
 }
