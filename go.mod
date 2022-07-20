@@ -3,7 +3,7 @@ module github.com/terraform-docs/terraform-docs
 go 1.15
 
 require (
-	github.com/BurntSushi/toml v0.3.1
+	github.com/BurntSushi/toml v1.2.0
 	github.com/go-test/deep v1.0.7
 	github.com/hashicorp/hcl v1.0.0
 	github.com/hashicorp/hcl/v2 v2.7.0
